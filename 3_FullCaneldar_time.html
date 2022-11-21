@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<!-- fullcalendar css -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.css">
+	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+	<!-- fullcalendar 언어 설정관련 script -->
+	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales-all.js"></script>
+	<style type="text/css">
+		.hide{
+			display:none;
+		}
+		.calendarPopup{
+			width:200px;
+			height:230px;
+			background-color:#a389ff;
+			position: absolute;
+			z-index: 1;
+		}
+		#calendar{
+			width: 100%;
+			height:100%;
+		}
+	</style>
+</head>
+<body>
+	<div id='calendar'></div>
+	<div class='hide calendarPopup' id="test">
+		<div style="padding:5px">
+			<p><span>title:</span><input type="text" id="title"></p>
+			<p>start:<input type="date" id="startdate"></p>
+			<p>end:<input type="date" id="enddate"></p>
+			<p>time:<input type="time" id="time" value="09:00"></p>
+			<p><button id="popupbutton">추가하기</button></p>
+		</div>
+	</div>
+	<div id="snackbar">Some text some message..</div>
+</body>
+<script type="text/javascript">
+	var randomColor =()=>'#' + Math.floor(Math.random()*16777215).toString(16);
+	document.addEventListener('DOMContentLoaded', function() {
+		var calendarEl = document.getElementById('calendar');
+		var calendarOption = {
+				initialView : 'dayGridMonth', // 초기 로드 될때 보이는 캘린더 화면(기본 설정: 달)
+				headerToolbar : { // 헤더에 표시할 툴 바
+					start : 'prev next today',
+					center : 'title',
+					end : 'dayGridMonth,dayGridWeek,dayGridDay'
+				},
+				titleFormat : function(date) {
+					return date.date.year + '년 ' + (parseInt(date.date.month) + 1) + '월';
+				},
+				//initialDate: '2021-07-15', // 초기 날짜 설정 (설정하지 않으면 오늘 날짜가 보인다.)
+				selectable : true, // 달력 일자 드래그 설정가능
+				droppable : true,
+				editable : true,
+				events:[{ //일정들
+					id:'test1', //일정 id
+					title:'테스트1', //타이틀 (내용)
+					start:new Date('2022-11-11'), //시작하는 날
+					end:new Date('2022-11-14'), //끝나는 날 '2022-11-14'처럼 문자로만도 가능. 대신 하루 전까지만 색칠됨
+					color:randomColor() //일정색깔 (backgroundColor로도 설정 가능)
+				},{
+					id:'test2',
+					title:'테스트2',
+					start:new Date('2022-11-16'),
+					end:new Date('2022-11-19'),
+					backgroundColor:randomColor(),
+				}],
+				dateClick:(event) =>{ //날짜칸 클릭할 때 생기는 이벤트
+					$('#test').toggleClass('hide');
+					$('#test').css('top',event.jsEvent.y);
+					$('#test').css('left',event.jsEvent.x);
+					$('#startdate').val(event.dateStr);
+					$('#enddate').val(event.dateStr);
+				},
+				eventClick:function(event){ //일정 클릭할 때 생기는 이벤트
+					console.log(event);
+					console.log(event.event._def.title);
+				},
+				eventMouseEnter:(event)=>{
+				},
+				nowIndicator: true, // 현재 시간 마크
+				locale: 'ko' // 한국어 설정
+			};
+		var calendar = new FullCalendar.Calendar(calendarEl, calendarOption);
+		calendar.render();
+		$('#popupbutton').on({
+			click:()=>{
+				calendarOption.events.push({title:$('#title').val(),
+																	start:new Date($('#startdate').val()+'T'+ $('#time').val()),
+																	end:new Date($('#enddate').val()+'T23:59'),
+																	backgroundColor:'#' + Math.floor(Math.random()*16777215).toString(16)
+																});
+				new FullCalendar.Calendar(calendarEl, calendarOption).render();
+				$('#test').toggleClass('hide');
+				$('#title').val('');$('#startdate').val('');$('#enddate').val('');
+			}
+		});
+	});
+</script>
+</html>
